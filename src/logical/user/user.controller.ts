@@ -1,7 +1,9 @@
-import { Body, Controller, Post, UseGuards } from '@nestjs/common';
+import { Body, Controller, Post, UsePipes } from '@nestjs/common';
 import { UserService } from './user.service';
 import { AuthService } from '../auth/auth.service';
-import { AuthGuard } from '@nestjs/passport';
+import { ValidationPipe } from '../../pipe/validation.pipe';
+// import { AuthGuard } from '@nestjs/passport';
+import { RegisterInfoDTO } from './user.dto'; // 引入 DTO
 
 @Controller('user')
 export class UserController {
@@ -13,11 +15,13 @@ export class UserController {
   findOne(@Body() body: any) {
     return this.usersService.findOne(body.username);
   }
+
+  @UsePipes(new ValidationPipe()) // 使用管道验证
   @Post('register')
-  async register(@Body() body: any) {
+  async register(@Body() body: RegisterInfoDTO) {
     return await this.usersService.register(body);
   }
-  @UseGuards(AuthGuard('jwt'))
+  // @UseGuards(AuthGuard('jwt'))
   @Post('login')
   async login(@Body() loginParams: any) {
     console.log('JWT验证 - Step 1: 用户请求登录');
